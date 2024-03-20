@@ -1,19 +1,44 @@
 import React from 'react';
 import './Game.css';
 
-const CELL_SIZE = 30;
-const WIDTH = 600;
-const HEIGHT = 600; 
+const CELL_SIZE = 15;
+const WIDTH = 300;
+const HEIGHT = 300; 
+const COLORS = {
+            0: 'White',
+            1: 'White',
+            2: 'Yellow',
+            3: 'Yellow',
+            4: 'Purple',
+            5: 'Purple',
+            6: 'Red',
+            7: 'Red',
+            8: 'DarkRed',
+            9: 'DarkRed'
+        }
 
 class Cells extends React.Component {
+    state = {
+        occurrences: 0,
+    }
+
     render() {
-        const { x, y } = this.props;
+        const { x, y, color } = this.props;
+        if(color === 0){
+            if(this.state.occurrences >= 8){
+                this.setState({occurrences: 8});
+            }else{
+                this.setState({occurrences: this.state.occurrences+1});
+            }
+        }
+        console.log(this.state.occurrences)
         return(
             <div className='Cell' style={{
                 left: `${CELL_SIZE * x + 1}px`,
                 top: `${CELL_SIZE * y + 1}px`,
                 width: `${CELL_SIZE - 1}px`,
                 height: `${CELL_SIZE - 1}px`,
+                backgroundColor: COLORS[this.state.occurrences],
             }}/>
         );
     }
@@ -33,6 +58,7 @@ class Game extends React.Component {
         interval: 100,
         isRunning: false, 
         aliveCells:0, 
+        heat: false,
     }
 
     autoRunGame = () => {
@@ -117,7 +143,8 @@ class Game extends React.Component {
         for (let y = 0; y < this.rows; y++) {
             for (let x = 0; x < this.cols; x++) {
                 if (this.board[y][x]) {
-                    cells.push({ x, y });
+                    let color = 0;
+                    cells.push({ x, y, color});
                 }
             }
         }
@@ -175,6 +202,16 @@ class Game extends React.Component {
 
     }
 
+    handleHeatColor = () => {
+        // Update the cells with the new colors
+        this.setState({ heat: true });
+    }
+
+    stopHeat = () => {
+        this.setState({ heat: false });
+    }
+    
+
     render() {
         const { cells } = this.state;
         
@@ -191,7 +228,7 @@ class Game extends React.Component {
                         />
                     </label>
                     <label>
-                        Columns: 
+                        Cols: 
                         <input 
                             type="number" 
                             onChange={this.handleColumnsChange} 
@@ -243,6 +280,18 @@ class Game extends React.Component {
                             AutoPlay
                         </button>
                     )}
+
+                        {/* heat map */}
+                    {this.state.heat ? (
+                        <button className="button" onClick={this.stopHeat}>
+                            stopHeat
+                        </button>
+                    ) : (
+                        <button className="button" onClick={this.handleHeatColor}>
+                            Heatmap
+                        </button>
+                    )}
+
                 </div>  
             </div>
         );

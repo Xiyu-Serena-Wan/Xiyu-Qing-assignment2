@@ -14,6 +14,7 @@ h1 {
 
 body {
   display: flex;
+  background-color: beige;
   justify-content: center;
   align-items: center;
 }
@@ -29,7 +30,37 @@ li {
   padding: 20px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
+/* Navbar.css */
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: beige;
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 20px;
+}
+
+.links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  color: white;
+}
+
+.links a {
+  text-decoration: none;
+  color: black;
+  font-family: Ubuntu, sans-serif;
+  margin: 0 40px;
+  font-size: 16px;
+  padding: 2px;
+  border: 1px solid gray;
+}
+
+/* @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
   }
@@ -48,7 +79,7 @@ li {
 
 .App-link {
   color: #61dafb;
-}
+} */
 
 @keyframes App-logo-spin {
   from {
