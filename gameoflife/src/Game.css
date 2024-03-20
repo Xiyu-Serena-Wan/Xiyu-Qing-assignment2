@@ -1,12 +1,30 @@
 .Board {
-    position: relative;
-    margin: 0 auto;
-    background-color: #000;
-    background-image: linear-gradient(#333 1px, transparent 1px),
+  position: relative;
+  margin: 0 auto;
+  background-color: #000;
+  background-image: linear-gradient(#333 1px, transparent 1px),
     linear-gradient(90deg, #333 1px, transparent 1px);
+  border: 1px solid black;
 }
 
 .Cell {
-    background: #ccc;
-    position: absolute;
+  background: white;
+  position: absolute;
+}
+
+.inputField {
+  gap: 5px;
+  margin-bottom: 0;
+}
+
+.buttonContainer {
+  margin-top: 5px;
+  background-color: beige;
+}
+
+button {
+  padding: 5px;
+  margin: 5px;
+  margin-top: 0;
+  background-color: lightgray;
 }

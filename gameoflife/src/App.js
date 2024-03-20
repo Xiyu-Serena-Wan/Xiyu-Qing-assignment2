@@ -1,10 +1,11 @@
 import './App.css';
 import Game from './Game';
+import Homepage from './Pages/Homepage';
 
 function App() {
+
   return (
     <div className="App">
-      <h1>Game Of Life</h1>
       <Game/>
     </div>
   );

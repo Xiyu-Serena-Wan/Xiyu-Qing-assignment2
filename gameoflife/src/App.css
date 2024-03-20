@@ -7,6 +7,28 @@
   pointer-events: none;
 }
 
+h1 {
+  background-color: beige;
+  margin-bottom: 5px;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+li {
+  margin: 20px;
+}
+
+.description {
+  width: 50vw;
+  height: auto;
+  background-color: beige;
+  padding: 20px;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
@@ -32,6 +54,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
