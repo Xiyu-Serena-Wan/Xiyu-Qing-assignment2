@@ -216,6 +216,7 @@ class Game extends React.Component {
     handleClear = () => {
         this.board = this.makeEmptyBoard();
         this.setState({ cells: this.makeCells() });
+        this.colorBoard = this.makeColorBoard();
         this.setState({heat: false})
         this.setState({ aliveCells: 0});
     }
@@ -224,22 +225,27 @@ class Game extends React.Component {
         const newRows = parseInt(this.rowsInput.current.value);
         const newCols = parseInt(this.colsInput.current.value);
         if (newRows >= 3 && newRows <= 40 && newCols >= 3 && newCols <= 40) {
-            this.setState({
-                rows: newRows,
-                cols: newCols,
-                showError: false, 
-            }); 
+            this.setState({ rows: newRows, cols: newCols, showError: false }, () => {
+                this.handleClear();
+            });
         } else {
             this.setState({ showError: true }); 
         }
     };
+    
 
     handleHeatColor = () => {
-        this.setState({ heat: true });
+        this.setState({ heat: true }, () => {
+            // Callback function to ensure state has been updated
+            this.setState({ cells: this.makeCells() });
+        });
     }
 
     stopHeat = () => {
-        this.setState({ heat: false });
+        this.setState({ heat: false }, () => {
+            // Callback function to ensure state has been updated
+            this.setState({ cells: this.makeCells() });
+        });
     }
     
 

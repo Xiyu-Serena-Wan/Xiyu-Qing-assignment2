@@ -1,3 +1,7 @@
+Team: Xiyu Wan, Qing Chen
+Extra bonus: Autoplay
+Extension days: 2 days
+
 1. What were some challenges you faced while making this app?
 
     During the development of this app, several problems arose because we're not that familiar with react hooks. To manage the grid(AKA board), we need to update the cell's color and calculate its neighbors accordingly. Meanwhile, we had to keep track of the cell's occurrences and the number of living cells, they all made things complicated. 
