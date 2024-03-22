@@ -189,7 +189,11 @@ class Game extends React.Component {
 
         if (x >= 0 && x <= this.state.cols && y >= 0 && y <= this.state.rows) {
             this.board[y][x] = !this.board[y][x];
-            this.setState({aliveCells: this.state.aliveCells+1});
+            if(this.board[y][x]){
+                this.setState({aliveCells: this.state.aliveCells+1});
+            }else{
+                this.setState({aliveCells: this.state.aliveCells-1});
+            }
         }
         this.setState({cells: this.makeCells()});
     }
