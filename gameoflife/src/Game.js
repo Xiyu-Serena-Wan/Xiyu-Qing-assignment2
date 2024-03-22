@@ -6,39 +6,27 @@ const WIDTH = 300;
 const HEIGHT = 300; 
 const COLORS = {
             0: 'White',
-            1: 'White',
+            1: 'Yellow',
             2: 'Yellow',
-            3: 'Yellow',
+            3: 'Purple',
             4: 'Purple',
-            5: 'Purple',
+            5: 'Red',
             6: 'Red',
-            7: 'Red',
+            7: 'DarkRed',
             8: 'DarkRed',
-            9: 'DarkRed'
         }
 
 class Cells extends React.Component {
-    state = {
-        occurrences: 0,
-    }
-
     render() {
         const { x, y, color } = this.props;
-        if(color === 0){
-            if(this.state.occurrences >= 8){
-                this.setState({occurrences: 8});
-            }else{
-                this.setState({occurrences: this.state.occurrences+1});
-            }
-        }
-        console.log(this.state.occurrences)
+        let bg = COLORS[color];
         return(
             <div className='Cell' style={{
                 left: `${CELL_SIZE * x + 1}px`,
                 top: `${CELL_SIZE * y + 1}px`,
                 width: `${CELL_SIZE - 1}px`,
                 height: `${CELL_SIZE - 1}px`,
-                backgroundColor: COLORS[this.state.occurrences],
+                backgroundColor: bg,
             }}/>
         );
     }
@@ -47,11 +35,11 @@ class Cells extends React.Component {
 class Game extends React.Component {
     constructor() {
         super();
-        this.rows = HEIGHT / CELL_SIZE;
-        this.cols = WIDTH / CELL_SIZE;
+        this.rowsInput = React.createRef();
+        this.colsInput = React.createRef();
         this.board = this.makeEmptyBoard();
+        this.colorBoard = this.makeColorBoard();
     }
-    
 
     state = {
         cells: [],
@@ -59,6 +47,9 @@ class Game extends React.Component {
         isRunning: false, 
         aliveCells:0, 
         heat: false,
+        rows: HEIGHT / CELL_SIZE,
+        cols: WIDTH / CELL_SIZE,
+        error: false,
     }
 
     autoRunGame = () => {
@@ -84,12 +75,13 @@ class Game extends React.Component {
         let newBoard = this.makeEmptyBoard();
         let aliveCellsCount = 0;
 
-        for (let y = 0; y < this.rows; y++) {
-            for (let x = 0; x < this.cols; x++) {
+        for (let y = 0; y < this.state.rows; y++) {
+            for (let x = 0; x < this.state.cols; x++) {
                 let neighbors = this.calculateNeighbors(this.board, x, y);
                 if (this.board[y][x]) {
                     if (neighbors === 2 || neighbors === 3) {
                         newBoard[y][x] = true;
+                        this.colorBoard[y][x]++;
                         aliveCellsCount++;
                     } else {
                         newBoard[y][x] = false;
@@ -97,11 +89,13 @@ class Game extends React.Component {
                 } else {
                     if (!this.board[y][x] && neighbors === 3) {
                         newBoard[y][x] = true;
+                        this.colorBoard[y][x]++;
                         aliveCellsCount++;
                     }
                 }
             }
         }
+
         this.board = newBoard;
         this.setState({ cells: this.makeCells() });
         this.setState({ aliveCells: aliveCellsCount });
@@ -109,6 +103,17 @@ class Game extends React.Component {
         this.timeoutHandler = window.setTimeout(() => {
             this.runIteration();
         }, this.state.interval);
+    }
+
+    makeColorBoard(){
+        let board = [];
+        for (let y = 0; y < this.state.rows; y++) {
+            board[y] = [];
+            for (let x = 0; x < this.state.cols; x++) {
+                board[y][x] = -1;
+            }
+        }
+        return board;
     }
 
     calculateNeighbors(board, x, y) {
@@ -119,7 +124,7 @@ class Game extends React.Component {
             let y1 = y + dir[0];
             let x1 = x + dir[1];
 
-            if (x1 >= 0 && x1 < this.cols && y1 >= 0 && y1 < this.rows && board[y1][x1]) {
+            if (x1 >= 0 && x1 < this.state.cols && y1 >= 0 && y1 < this.state.rows && board[y1][x1]) {
                 neighbors++;
             }
         }
@@ -129,9 +134,9 @@ class Game extends React.Component {
 
     makeEmptyBoard() {
         let board = [];
-        for (let y = 0; y < this.rows; y++) {
+        for (let y = 0; y < this.state.rows; y++) {
             board[y] = [];
-            for (let x = 0; x < this.cols; x++) {
+            for (let x = 0; x < this.state.cols; x++) {
                 board[y][x] = false;
             }
         }
@@ -140,14 +145,29 @@ class Game extends React.Component {
 
     makeCells() {
         let cells = [];
-        for (let y = 0; y < this.rows; y++) {
-            for (let x = 0; x < this.cols; x++) {
-                if (this.board[y][x]) {
-                    let color = 0;
-                    cells.push({ x, y, color});
+        if(this.state.heat){
+            for (let y = 0; y < this.state.rows; y++) {
+                for (let x = 0; x < this.state.cols; x++) {
+                    let color = this.colorBoard[y][x];
+                    if (color >= 0 && this.board[y][x]) {
+                        if(color >= 8){
+                            color = 8
+                        }
+                        cells.push({ x, y, color});
+                    }
                 }
             }
+        }else{
+            for (let y = 0; y < this.state.rows; y++) {
+                for (let x = 0; x < this.state.cols; x++) {
+                    if (this.board[y][x]) {
+                        let color = 0;
+                        cells.push({ x, y, color});
+                    }
+                }
+            }        
         }
+        
         return cells;
     }
 
@@ -167,43 +187,50 @@ class Game extends React.Component {
         const x = Math.floor(offsetX / CELL_SIZE);
         const y = Math.floor(offsetY / CELL_SIZE);
 
-        if (x >= 0 && x <= this.cols && y >= 0 && y <= this.rows) {
+        if (x >= 0 && x <= this.state.cols && y >= 0 && y <= this.state.rows) {
             this.board[y][x] = !this.board[y][x];
+            this.setState({aliveCells: this.state.aliveCells+1});
         }
         this.setState({cells: this.makeCells()});
     }
 
     handleRandom = () => {
         let count = 0;
-        for (let y = 0; y < this.rows; y++) {
-            for (let x = 0; x < this.cols; x++) {
-                // I set the rate 20% to make animation more visible
-                this.board[y][x] = (Math.random() < 0.2);
+        for (let y = 0; y < this.state.rows; y++) {
+            for (let x = 0; x < this.state.cols; x++) {
+                // this.board[y][x] = (Math.random() <= 0.05);
+                // Instead of 5%, I set the rate 20% to make animation more visible
+                this.board[y][x] = (Math.random() <= 0.2);
                 if(this.board[y][x] === true){count++;}
             }
         }
 
         this.setState({ cells: this.makeCells() });
         this.setState({ aliveCells: count });
-
     }
 
     handleClear = () => {
         this.board = this.makeEmptyBoard();
         this.setState({ cells: this.makeCells() });
+        this.setState({heat: false})
         this.setState({ aliveCells: 0});
     }
 
-    handleRowsChange () {
-
-    }
-
-    handleColumnsChange () {
-
-    }
+    handleSizeChange = () => {
+        const newRows = parseInt(this.rowsInput.current.value);
+        const newCols = parseInt(this.colsInput.current.value);
+        if (newRows >= 3 && newRows <= 40 && newCols >= 3 && newCols <= 40) {
+            this.setState({
+                rows: newRows,
+                cols: newCols,
+                showError: false, 
+            }); 
+        } else {
+            this.setState({ showError: true }); 
+        }
+    };
 
     handleHeatColor = () => {
-        // Update the cells with the new colors
         this.setState({ heat: true });
     }
 
@@ -213,35 +240,40 @@ class Game extends React.Component {
     
 
     render() {
-        const { cells } = this.state;
+        const { cells, rows, cols, showError } = this.state;
+        const width = cols * CELL_SIZE;
+        const height = rows * CELL_SIZE;
         
         return (
             <div>
                 <h1>Alive cells: {this.state.aliveCells}</h1>
-
+                
                 <div className='inputField'>
                     <label>
                         Rows: 
                         <input 
                             type="number" 
-                            onChange={this.handleRowsChange} 
+                            defaultValue={rows} 
+                            ref={this.rowsInput}
                         />
                     </label>
                     <label>
                         Cols: 
                         <input 
                             type="number" 
-                            onChange={this.handleColumnsChange} 
+                            defaultValue={cols} 
+                            ref={this.colsInput}
                         />
                     </label>
                     <button onClick={this.handleSizeChange}>Submit</button>
                 </div>
 
+                {showError && <div className="error-message">Please enter a number between 3 and 40.</div>}
 
                 <div className='Board' 
                     style={{ 
-                    width: WIDTH, 
-                    height: HEIGHT,
+                    width: `${width}px`, 
+                    height: `${height}px`,
                     backgroundSize: `${CELL_SIZE}px ${CELL_SIZE}px`
                     }}
                     onClick={this.handleClick}
@@ -250,7 +282,8 @@ class Game extends React.Component {
                     <Cells
                         x = {cell.x} 
                         y = {cell.y} 
-                        key = {`${cell.x}, ${cell.y}`}
+                        color = {cell.color}
+                        key = {`${cell.x}, ${cell.y}, ${cell.color}`}
                     />         
                         
                     ))}
