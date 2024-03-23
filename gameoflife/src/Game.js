@@ -149,7 +149,7 @@ class Game extends React.Component {
             for (let y = 0; y < this.state.rows; y++) {
                 for (let x = 0; x < this.state.cols; x++) {
                     let color = this.colorBoard[y][x];
-                    if (color >= 0 && this.board[y][x]) {
+                    if (color >= -1 && this.board[y][x]) {
                         if(color >= 8){
                             color = 8
                         }
